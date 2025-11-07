@@ -56,24 +56,29 @@ This approach ensures clear traceability and meets CA2’s requirement for **vis
 
 | Phase | Version Tag | Description | Key Deliverables |
 |-------|--------------|-------------|------------------|
-| **Phase 0 – Initialisation** | `v0.0-prd` | Repository structure, environment setup, config files, and internal docs. | `.env`, `requirements.txt`, `config.py`, `prd.md`, `dev_plan.md` |
-| **Phase 1 – Flask Scaffold** | `v0.1-setup` | Implement app factory, base route, run scripts (`run_app.sh` / `run_app.ps1`). | Flask app factory (`app/__init__.py`), `run.py`, run scripts, working root route |
-| **Phase 2 – Blueprint Structure** | `v0.2-blueprints` | Add `auth`, `notes`, and `admin` blueprints with placeholder routes. | `app/auth/routes.py`, `app/notes/routes.py`, `app/admin/routes.py`, registered blueprints |
-| **Phase 2.1 – Frontend Scaffolding** | `v0.3-home` | Add base templates & static assets (Jinja `base.html`, `home.html`, CSS) and simple nav. | `templates/base.html`, `templates/home.html`, `static/css/style.css`, screenshot of rendered home |
-| **Phase 2.2 – Database Scaffolding** | `v0.4-db` | Introduce local persistence (SQLite schema) and a simple DB connection helper (insecure by design for now). | `instance/schema.sql` or migrations, `app/db.py` helper, DB creation screenshot |
-| **Phase 2.3 – App Helpers & Middleware** | `v0.5-middleware` | Add common app helpers (flash, context processors), basic error handlers (403/404/500 placeholders) and simple middleware hooks. | `app/helpers.py`, `app/error_handlers.py`, `templates/403.html`, `templates/404.html`, evidence screenshot |
-| **Phase 3 – Insecure MVP (Intentional Vulnerabilities)** | `v1.0–v1.3` | Deliberately implement the insecure baseline to demonstrate vulnerabilities and form the testing target for hardening. | Demoable insecure app (auth + notes + admin) for testing and exploitation evidence |
-| • `v1.0-insecure-auth` | `v1.0-insecure-auth` | Implement `/register`, `/login`, `/logout` using raw SQL and plaintext password storage (intentional). | Auth routes, raw SQL usage, evidence of login flow + SQLi PoC screenshot |
-| • `v1.1-insecure-crud` | `v1.1-insecure-crud` | Implement `/notes` CRUD without ownership checks (IDOR) and without input sanitisation (stores arbitrary HTML). | Notes CRUD routes, sample stored XSS demonstration screenshot |
-| • `v1.2-insecure-admin` | `v1.2-insecure-admin` | Admin dashboard accessible to all users (no RBAC), exposing user lists and notes. | Admin routes, evidence of unprotected admin access |
-| • `v1.3-full-insecure` | `v1.3-full-insecure` | Combine the above into a working insecure MVP used as the baseline for security testing. | Full insecure app, consolidated exploitation screenshots (SQLi, XSS, IDOR) |
-| **Phase 4 – Testing & Analysis** | `v1.4–v1.5` | Run static and dynamic analysis to create a vulnerability baseline (Bandit, Semgrep, pytest). | `docs/evidence/` results for Bandit and Semgrep, `tests/` pytest outputs, vulnerability table |
-| **Phase 5 – Security Refactor** | `v2.0–v2.3` | Apply secure design and fixes mapped to SR1–SR9 and OWASP Top 10 (2025). Work is split into taggable steps for clear before/after evidence. | Hardened implementations and tests showing mitigation of each vulnerability |
-| • `v2.0-auth-hardening` | `v2.0-auth-hardening` | Replace plaintext passwords with bcrypt, integrate Flask-Login, and strengthen session handling. | Bcrypt integration, Flask-Login setup, tests verifying hashed passwords |
-| • `v2.1-validation-csrf` | `v2.1-validation-csrf` | Add Flask-WTF forms, CSRF protection, and input validation/sanitisation. | CSRF tokens on forms and sanitisation evidence |
-| • `v2.2-rbac-protection` | `v2.2-rbac-protection` | Enforce RBAC (User/Moderator/Admin) and per-record ownership checks to prevent IDOR. | RBAC decorators, ownership checks, tests demonstrating 403 on unauthorized access |
-| • `v2.3-secure-headers` | `v2.3-secure-headers` | Apply Flask-Talisman for CSP/HSTS and Flask-Limiter for rate limiting; disable debug in production config. | CSP/HSTS headers screenshot, rate limiting configured |
-| **Phase 6 – Verification & Documentation (Final Release)** | `v2.4–v2.6` | Final verification, test re-run, SAST comparison, evidence compilation, and report/video production. | Final tests, Bandit/Semgrep diffs, final README, technical report, unlisted demo video link |
+| **Phase 0 – Initialisation** | `v0.0-prd` | Repository structure, environment setup, config files, and internal documentation. | `.env`, `requirements.txt`, `config.py`, `prd.md`, `dev_plan.md` |
+| **Phase 1 – Flask Scaffold** | `v0.1-setup` | Implement Flask app factory, base route, and run scripts (`run_app.sh` / `run_app.ps1`). | `app/__init__.py`, `run.py`, run scripts, verified local app execution |
+| **Phase 2 – Blueprint Structure** | `v0.2-blueprints` | Add `auth`, `notes`, and `admin` blueprints with placeholder routes for modular architecture. | `app/auth/routes.py`, `app/notes/routes.py`, `app/admin/routes.py`, registered blueprints |
+| **Phase 2.1 – Frontend Scaffolding** | `v0.3-home` | Introduce Jinja templates, static assets, and initial UI placeholders. | `templates/base.html`, `templates/home.html`, `static/css/main.css`, screenshot of rendered home |
+|  | `v0.3.1-Home` | Base and homepage rendering | Implement `/home` route, integrate `render_template`, establish global navigation, and confirm CSS styling. |
+|  | `v0.3.2-Auth Templates` | Login + Register pages | Render real HTML templates for `/auth/login` and `/auth/register`. |
+|  | `v0.3.3-Notes Templates` | CRUD placeholders | Render pages for `/notes`, `/notes/create`, `/notes/view`, `/notes/edit`. |
+|  | `v0.3.4-Admin Template` | Admin dashboard placeholder | Implement basic admin overview layout. |
+|  | `v0.3.5-UI Polish` | UI refinement | Light global CSS and template cleanup before database setup. |
+| **Phase 2.2 – Database Scaffolding** | `v0.4-db` | Introduce SQLite schema and helper (intentionally insecure baseline). | `instance/schema.sql`, `app/db.py`, DB creation screenshot |
+| **Phase 2.3 – App Helpers & Middleware** | `v0.5-middleware` | Add flash messages, context processors, error handlers (403/404/500), and basic middleware hooks. | `app/helpers.py`, `app/error_handlers.py`, `templates/403.html`, `templates/404.html`, evidence screenshot |
+| **Phase 3 – Insecure MVP (Intentional Vulnerabilities)** | `v1.0–v1.3` | Build intentionally insecure baseline for later hardening and OWASP mapping. | Working insecure app used for testing and evidence |
+| • `v1.0-insecure-auth` | — | Implement `/register`, `/login`, `/logout` using raw SQL + plaintext passwords. | Auth routes with raw SQL, SQLi proof screenshot |
+| • `v1.1-insecure-crud` | — | Implement `/notes` CRUD without ownership checks (IDOR) or sanitisation. | Stored XSS + IDOR PoC evidence |
+| • `v1.2-insecure-admin` | — | Make admin dashboard globally accessible (no RBAC). | Evidence of unauthorized admin access |
+| • `v1.3-full-insecure` | — | Merge all insecure features into one working MVP. | Consolidated exploitation screenshots (SQLi, XSS, IDOR) |
+| **Phase 4 – Testing & Analysis** | `v1.4–v1.5` | Perform Bandit, Semgrep, and pytest to build vulnerability baseline. | Static/dynamic test reports and vulnerability table |
+| **Phase 5 – Security Refactor** | `v2.0–v2.3` | Incrementally harden the insecure app, mapping fixes to SR1–SR9 and OWASP Top 10 (2025). | Secure implementations with before/after evidence |
+| • `v2.0-auth-hardening` | — | Implement bcrypt hashing, Flask-Login sessions, and secure cookies. | Verified hashed passwords and session security |
+| • `v2.1-validation-csrf` | — | Integrate Flask-WTF forms, CSRF protection, and sanitisation. | CSRF tokens and sanitisation proof |
+| • `v2.2-rbac-protection` | — | Add RBAC and record ownership validation. | RBAC decorators, 403 checks |
+| • `v2.3-secure-headers` | — | Enforce CSP/HSTS via Flask-Talisman, rate limiting via Flask-Limiter. | Header evidence + rate-limit log |
+| **Phase 6 – Verification & Documentation (Final Release)** | `v2.4–v2.6` | Conduct final verification, SAST re-run, documentation, and video presentation. | Final README, Bandit/Semgrep comparison, final report, demo video |
 
 ---
 

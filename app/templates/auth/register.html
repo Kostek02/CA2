@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<main>
+    <h2>Register</h2>
+    <p>This version (v0.3.2) introduces the registration page layout.</p>
+
+    <form method="POST" action="#">
+        <label for="username">Username:</label><br>
+        <input type="text" id="username" name="username" placeholder="Choose a username"><br><br>
+
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password" placeholder="Choose a password"><br><br>
+
+        <button type="submit">Register</button>
+    </form>
+</main>
+{% endblock %}
