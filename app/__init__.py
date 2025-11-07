@@ -10,7 +10,7 @@ Purpose:
 - Prepares for future blueprint registration (auth, notes, admin).
 """
 
-from flask import Flask
+from flask import Flask, render_template
 
 # Import Blueprints
 from app.auth.routes import auth_bp
@@ -41,16 +41,17 @@ def create_app():
     app.register_blueprint(notes_bp, url_prefix="/notes")
     app.register_blueprint(admin_bp, url_prefix="/admin")
 
-    # Step 4: Keep a simple root route for v0.1 testing
+    # Step 4: Create a home route
     @app.route("/")
-    def index():
+    @app.route("/home")
+    def home():
         """
-        Root route for testing Flask setup.
+        Render the home page.
 
         Returns:
-            A plain text response confirming the app runs.
+            A rendered template of the home page.
         """
-        return "The App Runs with Blueprints registered"
+        return render_template("home.html", title="Home")
 
-    # Step 4: Return the configured Flask app
-    return app 
+    # Step 5: Return the configured Flask app
+    return app
