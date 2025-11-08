@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<main>
+    <h2>Admin Dashboard</h2>
+    <p>This is a placeholder for the Admin interface.</p>
+
+    <section>
+        <h3>Users (Preview)</h3>
+        <table border="1" cellpadding="5">
+            <tr><th>ID</th><th>Username</th><th>Role</th></tr>
+            <tr><td>1</td><td>admin</td><td>Admin</td></tr>
+            <tr><td>2</td><td>user1</td><td>User</td></tr>
+            <tr><td>3</td><td>moderator</td><td>Moderator</td></tr>
+        </table>
+    </section>
+
+    <section style="margin-top: 2rem;">
+        <h3>Notes (Preview)</h3>
+        <table border="1" cellpadding="5">
+            <tr><th>ID</th><th>Title</th><th>Owner</th></tr>
+            <tr><td>1</td><td>Welcome Note</td><td>admin</td></tr>
+            <tr><td>2</td><td>Sample Note</td><td>user1</td></tr>
+        </table>
+    </section>
+
+    <p style="margin-top: 2rem;">(Future: restricted by RBAC in v2.2)</p>
+</main>
+{% endblock %}

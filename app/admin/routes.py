@@ -9,7 +9,7 @@ Purpose:
 - Prepares for secure role-based access control (RBAC).
 """
 
-from flask import Blueprint
+from flask import Blueprint, render_template
 
 # Blueprint definition
 admin_bp = Blueprint("admin", __name__)
@@ -20,6 +20,6 @@ def admin_home():
     Admin dashboard route placeholder.
 
     Returns:
-        A plain text response confirming the Admin blueprint is active.
+        Renders the admin dashboard template.
     """
-    return "Admin Blueprint Active - Admin Dashboard Placeholder"
+    return render_template("admin/dashboard.html", title="Admin Dashboard - Secure Notes")
