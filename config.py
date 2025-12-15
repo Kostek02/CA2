@@ -46,3 +46,7 @@ class Config:
     
     # Controls the runtime environment (Development, Production, etc.)
     FLASK_ENV = os.getenv('FLASK_ENV', 'development')
+
+    # Rate Limiting (v2.3.1)
+    RATELIMIT_ENABLED = os.getenv('RATELIMIT_ENABLED', 'True').lower() == 'true'
+    RATELIMIT_STORAGE_URL = os.getenv('RATELIMIT_STORAGE_URL', 'memory://')

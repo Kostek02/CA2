@@ -9,7 +9,7 @@ Purpose:
 - Demonstrates secure error management principles (SR9)
 """
 
-from flask import render_template
+from flask import render_template, flash
 
 def register_errorhandlers(app):
     """
@@ -27,3 +27,17 @@ def register_errorhandlers(app):
     @app.errorhandler(500)
     def internal_error(error):
         return render_template("500.html", title="Server Error"), 500
+
+    @app.errorhandler(429)
+    def ratelimit_handler(e):
+        '''
+        Custom handler for rate limit errors (v2.3.1).
+        
+        Args:
+            e: The 429 error exception
+            
+        Returns:
+            Rendered 429 error page with 429 status code
+        '''
+        flash("Too many requests. Please try again later.", "error")
+        return render_template("429.html", title="Rate Limit Exceeded"), 429
