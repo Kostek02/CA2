@@ -69,26 +69,26 @@ This approach ensures clear traceability and meets CA2’s requirement for **vis
 | **Phase 2.3 – App Helpers & Middleware** | `v0.5-middleware` | Add flash messages, context processors, error handlers (403/404/500), and middleware hooks. | `app/helpers.py`, `app/error_handlers.py`, `templates/403.html`, `templates/404.html`, evidence screenshot |
 
 ### Phase 2.4 – Functional Baseline (`v0.9.x`)
-Establish a complete **working application** before deliberate vulnerability introduction.
+Establish a complete **working application** with intentional vulnerabilities.
 
 | Sub-Phase | Version Tag | Description | Key Deliverables |
 |------------|--------------|-------------|------------------|
 | **Functional /Notes/** | `v0.9.1-notes-crud` | Implement full CRUD operations backed by SQLite. | Create/Edit/View/Delete notes, DB persistence proof |
 | **Functional /Auth/** | `v0.9.2-auth-basic` | Add working `/register` and `/login` routes using raw SQL + plaintext storage. | Successful registration + login, DB user records |
 | **Functional /Admin/** | `v0.9.3-admin-linkage` | Connect user–note relationships and basic admin overview (list users/notes). | `/admin` shows all records, privilege structure ready |
-| **Functional Integration Tests** | `v0.9.4-stable-baseline` | Verify all routes + templates work end-to-end before insecure refactor. | Full CRUD + Auth + Admin flow demo, evidence screenshots |
+| **Functional Integration Tests** | `v0.9.4-stable-baseline` | Verify all routes + templates work end-to-end. Document all intentional vulnerabilities. | Full CRUD + Auth + Admin flow demo, evidence screenshots |
 
 ---
 
 ### Phase 3 – Insecure MVP (Intentional Vulnerabilities)
-Create an intentionally insecure system that maps to OWASP Top 10 risks.
+**Note:** All vulnerabilities were present in the functional baseline (v0.9.x) and verified during v0.9.4 testing. The insecure MVP consolidates these demonstrated vulnerabilities.
 
 | Sub-Phase | Version Tag | Description | Key Deliverables |
 |------------|--------------|-------------|------------------|
 | **Insecure /Auth/** | `v1.0-insecure-auth` | Raw SQL auth with plaintext passwords → SQLi exploitation. | SQLi bypass screenshot, DB leak evidence |
 | **Insecure /Notes/** | `v1.1-insecure-crud` | Missing ownership checks (IDOR) + unsanitised inputs (XSS). | Stored XSS + IDOR PoC evidence |
 | **Insecure /Admin/** | `v1.2-insecure-admin` | No RBAC → unauthenticated access to admin routes. | Proof of unauthorised access |
-| **Merged Insecure MVP** | `v1.3-full-insecure` | Consolidate all vulnerabilities into one testable application. | Combined SQLi/XSS/IDOR exploitation screenshots |
+| **Merged Insecure MVP** | `v1.3-full-insecure` | Consolidate all vulnerabilities into one testable application. All vulnerabilities demonstrated and documented in v0.9.4 testing. | Combined SQLi/XSS/IDOR exploitation screenshots, full vulnerability documentation |
 
 ---
 
