@@ -1,8 +1,81 @@
 {% extends "base.html" %}
 {% block content %}
 <section class="home">
-  <h2>Welcome to the Secure Notes Application</h2>
-  <p>This version (v0.3.1) introduces the homepage layout and structure.</p>
-  <p> This is the Home page of the Secure Notes Application.</p>
+  <div class="hero-section">
+    <h1>Welcome to Secure Notes</h1>
+    <p class="subtitle">A production-ready, security-hardened note management application</p>
+    {% if not current_user.is_authenticated %}
+    <div class="cta-buttons">
+      <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Get Started</a>
+      <a href="{{ url_for('auth.login') }}" class="btn btn-secondary">Login</a>
+    </div>
+    {% else %}
+    <div class="cta-buttons">
+      <a href="{{ url_for('notes.notes_home') }}" class="btn btn-primary">View My Notes</a>
+      <a href="{{ url_for('notes.create_note') }}" class="btn btn-secondary">Create Note</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="features-section">
+    <h2>Features</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <h3>🔒 Secure Authentication</h3>
+        <p>Password hashing with bcrypt, secure session management, and rate limiting to protect against brute force attacks.</p>
+      </div>
+      <div class="feature-card">
+        <h3>📝 Note Management</h3>
+        <p>Create, view, edit, and delete your notes with a clean, intuitive interface. Your data is protected with ownership checks.</p>
+      </div>
+      <div class="feature-card">
+        <h3>👥 Role-Based Access</h3>
+        <p>Three user roles (User, Moderator, Admin) with granular permissions for secure collaboration and administration.</p>
+      </div>
+      <div class="feature-card">
+        <h3>🛡️ Security Hardened</h3>
+        <p>CSRF protection, input validation, parameterized queries, security headers, and comprehensive audit logging.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="security-section">
+    <h2>Security Highlights</h2>
+    <div class="security-list">
+      <div class="security-item">
+        <strong>✅ SQL Injection Protection</strong>
+        <p>All database queries use parameterized statements to prevent SQL injection attacks.</p>
+      </div>
+      <div class="security-item">
+        <strong>✅ CSRF Protection</strong>
+        <p>All forms are protected with CSRF tokens to prevent cross-site request forgery.</p>
+      </div>
+      <div class="security-item">
+        <strong>✅ Secure Headers</strong>
+        <p>Content Security Policy (CSP), HSTS, X-Frame-Options, and other security headers are enforced.</p>
+      </div>
+      <div class="security-item">
+        <strong>✅ Audit Logging</strong>
+        <p>All authentication, CRUD operations, and security events are logged for monitoring and forensics.</p>
+      </div>
+    </div>
+  </div>
+
+  {% if current_user.is_authenticated %}
+  <div class="user-info-section">
+    <h2>Your Account</h2>
+    <p>Logged in as: <strong>{{ current_user.username }}</strong></p>
+    <p>Role: <strong>{{ current_user.role|title }}</strong></p>
+    {% if current_user.is_admin() %}
+    <p class="admin-badge">🔑 Administrator Access</p>
+    {% elif current_user.is_moderator() %}
+    <p class="moderator-badge">🛡️ Moderator Access</p>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <div class="version-info">
+    <p><small>Secure Notes v2.4 - Production Ready | All Security Requirements (SR1-SR9) Complete</small></p>
+  </div>
 </section>
 {% endblock %}

@@ -1,0 +1,31 @@
+app/__init__.py:28:1: E302 expected 2 blank lines, found 1
+app/__init__.py:65:13: E261 at least two spaces before inline comment
+app/__init__.py:80:15: W292 no newline at end of file
+app/admin/__init__.py:11:1: F401 'app.admin.routes.admin_bp' imported but unused
+app/admin/__init__.py:11:38: W292 no newline at end of file
+app/admin/routes.py:17:1: F401 'flask.session' imported but unused
+app/admin/routes.py:47:39: W291 trailing whitespace
+app/admin/routes.py:48:19: W291 trailing whitespace
+app/admin/routes.py:49:52: W291 trailing whitespace
+app/admin/routes.py:59:6: W292 no newline at end of file
+app/auth/__init__.py:11:1: F401 'app.auth.routes.auth_bp' imported but unused
+app/auth/__init__.py:11:36: W292 no newline at end of file
+app/auth/routes.py:140:37: W292 no newline at end of file
+app/db.py:48:52: W292 no newline at end of file
+app/error_handlers.py:14:1: E302 expected 2 blank lines, found 1
+app/helpers.py:17:1: E302 expected 2 blank lines, found 1
+app/helpers.py:42:34: W292 no newline at end of file
+app/middleware.py:15:1: E302 expected 2 blank lines, found 1
+app/middleware.py:31:24: W292 no newline at end of file
+app/notes/__init__.py:11:1: F401 'app.notes.routes.notes_bp' imported but unused
+app/notes/__init__.py:11:38: W292 no newline at end of file
+app/notes/routes.py:29:1: W293 blank line contains whitespace
+app/notes/routes.py:32:1: W293 blank line contains whitespace
+app/notes/routes.py:72:1: W293 blank line contains whitespace
+app/notes/routes.py:78:101: E501 line too long (116 > 100 characters)
+app/notes/routes.py:81:101: E501 line too long (111 > 100 characters)
+app/notes/routes.py:82:1: W293 blank line contains whitespace
+app/notes/routes.py:119:15: F541 f-string is missing placeholders
+app/notes/routes.py:150:23: F541 f-string is missing placeholders
+app/notes/routes.py:175:15: F541 f-string is missing placeholders
+app/notes/routes.py:210:49: W292 no newline at end of file

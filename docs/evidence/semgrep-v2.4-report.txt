@@ -1,0 +1,22 @@
+                  
+                  
+┌────────────────┐
+│ 1 Code Finding │
+└────────────────┘
+                       
+    app/notes/routes.py
+   ❯❯❱ python.flask.security.injection.tainted-sql-string.tainted-sql-string
+          Detected user input used to manually construct a SQL string.
+          This is usually bad practice because manual construction    
+          could accidentally result in a SQL injection. An attacker   
+          could use a SQL injection to steal or modify contents of the
+          database. Instead, use a parameterized query which is       
+          available by default in most database engines.              
+          Alternatively, consider using an object-relational mapper   
+          (ORM) such as SQLAlchemy which will protect your queries.   
+          Details: https://sg.run/JxZj                                
+                                                                      
+          245┆ log_error('403', f'Delete denied for note   
+               {note_id}', details=f'User {current_user.id}
+               attempted to delete note owned by           
+               {note["user_id"]}')                         

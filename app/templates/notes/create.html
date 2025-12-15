@@ -1,29 +1,39 @@
-{# Create Note Template - v0.9.1: Functional baseline #}
-{# Form to create new note (no CSRF protection yet - v2.1.1) #}
+{# Create Note Template - v2.1.1: CSRF protection and validation #}
 {% extends "base.html" %}
 {% block content %}
 <main>
     <h1>Create New Note</h1>
     
-    {# Note creation form - POSTs to create_note route #}
+    {# Note creation form with CSRF protection (v2.1.1) #}
     <form method="POST" action="{{ url_for('notes.create_note') }}">
-        {# Title input field #}
+        {{ form.hidden_tag() }}  {# CSRF token #}
+        
         <div style="margin-bottom: 1rem;">
-            <label for="title">Title:</label><br>
-            <input type="text" id="title" name="title" required 
-                   style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+            {{ form.title.label }}<br>
+            {{ form.title(class="form-control", style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;") }}
+            {% if form.title.errors %}
+                <div style="color: #dc3545; font-size: 0.875rem; margin-top: 0.25rem;">
+                    {% for error in form.title.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
         
-        {# Content textarea field #}
         <div style="margin-bottom: 1rem;">
-            <label for="content">Content:</label><br>
-            <textarea id="content" name="content" rows="10" required
-                      style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;"></textarea>
+            {{ form.content.label }}<br>
+            {{ form.content(class="form-control", style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;") }}
+            {% if form.content.errors %}
+                <div style="color: #dc3545; font-size: 0.875rem; margin-top: 0.25rem;">
+                    {% for error in form.content.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
         
-        {# Form action buttons #}
         <div>
-            <button type="submit" class="btn btn-primary">Create Note</button>
+            {{ form.submit(class="btn btn-primary") }}
             <a href="{{ url_for('notes.notes_home') }}" class="btn btn-secondary">Cancel</a>
         </div>
     </form>

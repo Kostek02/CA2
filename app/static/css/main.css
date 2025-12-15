@@ -36,6 +36,31 @@ body {
   nav a:hover {
     color: #1e90ff;
   }
+
+  nav .user-info {
+    color: #aab1ba;
+    margin: 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+  }
+
+  .role-badge {
+    font-size: 0.75em;
+    padding: 0.2em 0.5em;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  .role-badge.admin {
+    background-color: #ff6b6b;
+    color: #ffffff;
+  }
+
+  .role-badge.moderator {
+    background-color: #4ecdc4;
+    color: #0e141b;
+  }
   
   /* Main content */
   main {
@@ -115,4 +140,178 @@ body {
     padding: 1em;
     font-size: 0.9em;
     border-top: 1px solid #2b3948;
+  }
+
+  /* Home Page Styles - v2.5 */
+  .hero-section {
+    text-align: center;
+    padding: 3em 0;
+    margin-bottom: 3em;
+  }
+
+  .hero-section h1 {
+    font-size: 2.5em;
+    margin-bottom: 0.5em;
+    color: #ffffff;
+    border: none;
+  }
+
+  .subtitle {
+    font-size: 1.2em;
+    color: #aab1ba;
+    margin-bottom: 2em;
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: 1em;
+    justify-content: center;
+    margin-top: 2em;
+  }
+
+  .btn {
+    padding: 0.8em 2em;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+  }
+
+  .btn-primary {
+    background-color: #1e90ff;
+    color: #ffffff;
+  }
+
+  .btn-primary:hover {
+    background-color: #00ffa1;
+    color: #0e141b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(30, 144, 255, 0.4);
+  }
+
+  .btn-secondary {
+    background-color: transparent;
+    color: #1e90ff;
+    border: 2px solid #1e90ff;
+  }
+
+  .btn-secondary:hover {
+    background-color: #1e90ff;
+    color: #ffffff;
+    transform: translateY(-2px);
+  }
+
+  .features-section {
+    margin: 3em 0;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5em;
+    margin-top: 2em;
+  }
+
+  .feature-card {
+    background-color: #162029;
+    padding: 1.5em;
+    border-radius: 8px;
+    border: 1px solid #2b3948;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    border-color: #1e90ff;
+  }
+
+  .feature-card h3 {
+    color: #1e90ff;
+    margin-top: 0;
+    margin-bottom: 0.5em;
+    font-size: 1.2em;
+  }
+
+  .feature-card p {
+    color: #aab1ba;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .security-section {
+    margin: 3em 0;
+    background-color: #162029;
+    padding: 2em;
+    border-radius: 8px;
+    border: 1px solid #2b3948;
+  }
+
+  .security-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5em;
+    margin-top: 1.5em;
+  }
+
+  .security-item {
+    padding: 1em;
+    background-color: #0e141b;
+    border-radius: 6px;
+    border-left: 4px solid #1e90ff;
+  }
+
+  .security-item strong {
+    color: #00ffa1;
+    display: block;
+    margin-bottom: 0.5em;
+  }
+
+  .security-item p {
+    color: #aab1ba;
+    margin: 0;
+  }
+
+  .user-info-section {
+    margin: 3em 0;
+    padding: 2em;
+    background-color: #162029;
+    border-radius: 8px;
+    border: 1px solid #2b3948;
+    text-align: center;
+  }
+
+  .user-info-section h2 {
+    border: none;
+    margin-bottom: 1em;
+  }
+
+  .admin-badge, .moderator-badge {
+    display: inline-block;
+    padding: 0.5em 1em;
+    border-radius: 6px;
+    margin-top: 1em;
+    font-weight: 600;
+  }
+
+  .admin-badge {
+    background-color: #ff6b6b;
+    color: #ffffff;
+  }
+
+  .moderator-badge {
+    background-color: #4ecdc4;
+    color: #0e141b;
+  }
+
+  .version-info {
+    text-align: center;
+    margin-top: 3em;
+    padding-top: 2em;
+    border-top: 1px solid #2b3948;
+  }
+
+  .version-info small {
+    color: #aab1ba;
   }  

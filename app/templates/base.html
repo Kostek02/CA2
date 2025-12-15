@@ -11,15 +11,24 @@
     <h1>Secure Notes Web App</h1>
     <nav>
       <a href="{{ url_for('home') }}">Home</a>
-      {% if session.get('user_id') %}
+      {% if current_user.is_authenticated %}
           <a href="{{ url_for('notes.notes_home') }}">Notes</a>
-          <span>Logged in as: {{ session.get('username') }}</span>
+          <span class="user-info">
+            {{ current_user.username }}
+            {% if current_user.is_admin() %}
+              <span class="role-badge admin">Admin</span>
+            {% elif current_user.is_moderator() %}
+              <span class="role-badge moderator">Mod</span>
+            {% endif %}
+          </span>
           <a href="{{ url_for('auth.logout') }}">Logout</a>
       {% else %}
           <a href="{{ url_for('auth.login') }}">Login</a>
           <a href="{{ url_for('auth.register') }}">Register</a>
       {% endif %}
-      <a href="{{ url_for('admin.admin_home') }}">Admin</a>
+      {% if current_user.is_authenticated and current_user.is_admin() %}
+          <a href="{{ url_for('admin.admin_home') }}">Admin</a>
+      {% endif %}
   </nav>
   </header>
 

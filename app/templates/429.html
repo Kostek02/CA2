@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<main>
+    <h1>Rate Limit Exceeded</h1>
+    <p>You have made too many requests. Please wait a moment and try again.</p>
+    <p><a href="{{ url_for('home') }}">Return to Home</a></p>
+</main>
+{% endblock %}

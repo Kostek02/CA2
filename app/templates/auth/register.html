@@ -15,22 +15,36 @@
         {% endif %}
     {% endwith %}
 
-    {# Registration form - no CSRF protection (vulnerable to CSRF) #}
+    {# Registration form with CSRF protection (v2.1.1) #}
     <form method="POST" action="{{ url_for('auth.register') }}">
+        {{ form.hidden_tag() }}  {# CSRF token #}
+        
         <div style="margin-bottom: 1rem;">
-            <label for="username">Username:</label><br>
-            <input type="text" id="username" name="username" placeholder="Choose a username" required
-                   style="width: 100%; max-width: 300px; padding: 0.5rem; margin-top: 0.25rem;">
+            {{ form.username.label }}<br>
+            {{ form.username(class="form-control", style="width: 100%; max-width: 300px; padding: 0.5rem; margin-top: 0.25rem;") }}
+            {% if form.username.errors %}
+                <div style="color: #dc3545; font-size: 0.875rem; margin-top: 0.25rem;">
+                    {% for error in form.username.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
 
         <div style="margin-bottom: 1rem;">
-            <label for="password">Password:</label><br>
-            <input type="password" id="password" name="password" placeholder="Choose a password" required
-                   style="width: 100%; max-width: 300px; padding: 0.5rem; margin-top: 0.25rem;">
+            {{ form.password.label }}<br>
+            {{ form.password(class="form-control", style="width: 100%; max-width: 300px; padding: 0.5rem; margin-top: 0.25rem;") }}
+            {% if form.password.errors %}
+                <div style="color: #dc3545; font-size: 0.875rem; margin-top: 0.25rem;">
+                    {% for error in form.password.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
 
         <div>
-            <button type="submit" class="btn btn-primary">Register</button>
+            {{ form.submit(class="btn btn-primary") }}
             <a href="{{ url_for('auth.login') }}" class="btn btn-secondary">Already have an account? Login</a>
         </div>
     </form>

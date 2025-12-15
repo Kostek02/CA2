@@ -1,0 +1,96 @@
+                    
+                    
+┌──────────────────┐
+│ 13 Code Findings │
+└──────────────────┘
+                      
+    app/auth/routes.py
+   ❯❯❱ python.flask.security.injection.tainted-sql-string.tainted-sql-string
+          Detected user input used to manually construct a SQL string.
+          This is usually bad practice because manual construction    
+          could accidentally result in a SQL injection. An attacker   
+          could use a SQL injection to steal or modify contents of the
+          database. Instead, use a parameterized query which is       
+          available by default in most database engines.              
+          Alternatively, consider using an object-relational mapper   
+          (ORM) such as SQLAlchemy which will protect your queries.   
+          Details: https://sg.run/JxZj                                
+                                                                      
+           51┆ check_query = f"SELECT * FROM users WHERE username
+               = '{username}'"                                   
+            ⋮┆----------------------------------------
+           64┆ insert_query = f"INSERT INTO users (username, 
+               password) VALUES ('{username}', '{password}')"
+            ⋮┆----------------------------------------
+          104┆ query = f"SELECT * FROM users WHERE username =
+               '{username}' AND password = '{password}'"     
+                       
+    app/notes/routes.py
+    ❯❱ python.django.security.injection.sql.sql-injection-using-db-cursor-
+       execute.sql-injection-db-cursor-execute                            
+          User-controlled data from a request is passed to         
+          'execute()'. This could lead to a SQL injection and      
+          therefore protected information could be leaked. Instead,
+          use django's QuerySets, which are built with query       
+          parameterization and therefore not vulnerable to sql     
+          injection. For example, you could use                    
+          `Entry.objects.filter(date=2006)`.                       
+          Details: https://sg.run/qx7y                             
+                                                                   
+           59┆ title = request.form.get("title", "")
+           60┆ content = request.form.get("content", "")
+           61┆
+           62┆ # Basic validation (minimal - no proper
+               sanitisation)                          
+           63┆ if not title or not content:
+           64┆     flash("Title and content are required.",
+               "error")                                    
+           65┆     return render_template(
+           66┆         "notes/create.html",
+           67┆         title="Create Note - Secure Notes"
+           68┆     )
+             [hid 15 additional lines, adjust with --max-lines-per-finding] 
+           60┆ content = request.form.get("content", "")
+           61┆
+           62┆ # Basic validation (minimal - no proper
+               sanitisation)                          
+           63┆ if not title or not content:
+           64┆     flash("Title and content are required.",
+               "error")                                    
+           65┆     return render_template(
+           66┆         "notes/create.html",
+           67┆         title="Create Note - Secure Notes"
+           68┆     )
+           69┆
+             [hid 14 additional lines, adjust with --max-lines-per-finding] 
+   
+   ❯❯❱ python.flask.security.injection.tainted-sql-string.tainted-sql-string
+          Detected user input used to manually construct a SQL string.
+          This is usually bad practice because manual construction    
+          could accidentally result in a SQL injection. An attacker   
+          could use a SQL injection to steal or modify contents of the
+          database. Instead, use a parameterized query which is       
+          available by default in most database engines.              
+          Alternatively, consider using an object-relational mapper   
+          (ORM) such as SQLAlchemy which will protect your queries.   
+          Details: https://sg.run/JxZj                                
+                                                                      
+           78┆ insert_query = f"INSERT INTO notes (title, content,
+               user_id) VALUES ('{title}', '{content}',           
+               {user_id})"                                        
+            ⋮┆----------------------------------------
+           81┆ insert_query = f"INSERT INTO notes (title, content,
+               user_id) VALUES ('{title}', '{content}', NULL)"    
+            ⋮┆----------------------------------------
+          110┆ query = f"SELECT * FROM notes WHERE id = {note_id}"
+            ⋮┆----------------------------------------
+          146┆ query = f"SELECT * FROM notes WHERE id = {note_id}"
+            ⋮┆----------------------------------------
+          157┆ query = f"UPDATE notes SET title = '{title}',
+               content = '{content}' WHERE id = {note_id}"  
+            ⋮┆----------------------------------------
+          166┆ query = f"SELECT * FROM notes WHERE id = {note_id}"
+            ⋮┆----------------------------------------
+          195┆ query = f"SELECT * FROM notes WHERE id = {note_id}"
+            ⋮┆----------------------------------------
+          205┆ query = f"DELETE FROM notes WHERE id = {note_id}"

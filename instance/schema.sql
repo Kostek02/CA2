@@ -1,5 +1,5 @@
--- Insecure baseline schema for v0.4
--- Plaintext passwords and no foreign keys — for testing insecure MVP (v1.x)
+-- instance/schema.sql
+-- v2.2.1: Updated schema with role column for RBAC
 
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS notes;
@@ -7,7 +7,8 @@ DROP TABLE IF EXISTS notes;
 CREATE TABLE users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT NOT NULL UNIQUE,
-    password TEXT NOT NULL            -- plaintext for v1.x vulnerabilities
+    password TEXT NOT NULL,
+    role TEXT DEFAULT 'user'  -- v2.2.1: Added role column (values: 'user', 'moderator', 'admin')
 );
 
 CREATE TABLE notes (

@@ -14,5 +14,17 @@ __pycache__/
 venv/
 .DS_Store
 
+# Testing
+tests/__pycache__/
+tests/*.pyc
+htmlcov/
+.pytest_cache/
+.coverage
+
 # Database
 instance/secure_notes.db
+
+# Log files (v2.3.2)
+logs/*.log
+logs/*.log.*
+!docs/evidence/**/*.log
