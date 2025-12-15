@@ -9,42 +9,40 @@ Purpose:
 
 v0.9.3: Functional baseline - INTENTIONALLY INSECURE
 - Uses string concatenation for SQL queries (SQL injection vulnerable)
-- No access control - anyone can access admin route (will be fixed in v2.2.1)
 - Shows plaintext passwords (demonstrates vulnerability)
-- No RBAC - no role-based restrictions
+- RBAC implemented in v2.2.1
 """
 
 from flask import Blueprint, render_template, session
 from app.db import get_db
 from flask_login import login_required
+from app.rbac import admin_required
 
 # Blueprint definition
 admin_bp = Blueprint("admin", __name__)
 
 
 @admin_bp.route("/")
+@admin_required  # v2.2.1: Require admin role
 @login_required
 def admin_home():
     """
     Admin dashboard route - displays all users and notes.
 
-    v0.9.3: No access control - anyone can access (vulnerability)
-    Will add RBAC in v2.2.1 to restrict to admin users only.
+    v2.2.1: Only admins can access
 
     Returns:
-        Renders the admin dashboard with all users and notes.
+        Renders the admin dashboard with all users and notes or 403 error
     """
     db = get_db()
 
     # Fetch all users from database
     # INSECURE: String concatenation - vulnerable to SQL injection
-    # INSECURE: No access control - anyone can view all users
     users_query = "SELECT * FROM users ORDER BY id"
     users = db.execute(users_query).fetchall()
 
     # Fetch all notes with user information (LEFT JOIN to get username)
     # INSECURE: String concatenation - vulnerable to SQL injection
-    # Shows all notes regardless of ownership (IDOR vulnerability)
     notes_query = """
         SELECT notes.*, users.username 
         FROM notes 

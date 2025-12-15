@@ -15,10 +15,11 @@ v0.9.1: Functional baseline - INTENTIONALLY INSECURE
 - Security hardening will be added in v2.x
 """
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, abort
 from app.db import get_db
 from flask_login import login_required, current_user
 from app.notes.forms import NoteForm
+from app.rbac import check_note_ownership, can_edit_note, can_delete_note, can_view_note
 
 # Blueprint definition
 notes_bp = Blueprint("notes", __name__)
@@ -28,26 +29,34 @@ notes_bp = Blueprint("notes", __name__)
 @login_required
 def notes_home():
     '''
-    Notes dashboard route - displays notes.
+    Notes dashboard route - displays notes filtered by role.
     
-    v0.9.3: Shows all notes (no filtering yet - IDOR vulnerable)
-    Will add user filtering in v2.2.1 with ownership checks.
+    v2.2.1: RBAC filtering
+    - User: Shows only their own notes
+    - Moderator/Admin: Shows all notes
     
     Returns:
-        Renders the notes dashboard page with a list of notes.
+        Renders the notes dashboard page with filtered list of notes.
     '''
     db = get_db()
-    # INSECURE: No filtering by user_id - shows all notes (IDOR vulnerability)
-    # No ownership checks - anyone can see/edit/delete any note
-    notes = db.execute(
-        "SELECT * FROM notes ORDER BY created_at DESC"
-    ).fetchall()
+    
+    # v2.2.1: Filter notes by role
+    if current_user.is_admin() or current_user.is_moderator():
+        # Admin and Moderator can see all notes
+        notes = db.execute(
+            "SELECT * FROM notes ORDER BY created_at DESC"
+        ).fetchall()
+    else:
+        # Regular users can only see their own notes
+        # Note: SQL injection still present (will be fixed with parameterized queries)
+        query = f"SELECT * FROM notes WHERE user_id = {current_user.id} ORDER BY created_at DESC"
+        notes = db.execute(query).fetchall()
+    
     return render_template(
         "notes/dashboard.html",
         title="Notes Dashboard - Secure Notes",
         notes=notes
     )
-
 
 @notes_bp.route("/create", methods=["GET", "POST"])
 @login_required
@@ -88,75 +97,84 @@ def create_note():
 @login_required
 def view_note(note_id):
     """
-    Note viewing route - displays a single note in read-only mode.
-
+    View a specific note.
+    
+    v2.2.1: RBAC check - user must own note OR be moderator/admin
+    
     Args:
-        note_id (int): ID of the note to view.
-
+        note_id: ID of note to view
+        
     Returns:
-        Renders the note viewing page, or 404 if note not found.
+        Renders note view page or 403/404 error
     """
+    # v2.2.1: Check if user can view this note
+    if not can_view_note(note_id):
+        abort(403)  # Forbidden
+    
     db = get_db()
-    # INSECURE: String concatenation - vulnerable to SQL injection
-    # No ownership check - anyone can view any note
     query = f"SELECT * FROM notes WHERE id = {note_id}"
     note = db.execute(query).fetchone()
-
-    if note is None:
-        flash("Note not found.", "error")
-        return redirect(url_for("notes.notes_home"))
-
+    
+    if not note:
+        abort(404)  # Not found
+    
     return render_template(
         "notes/view.html",
-        title=f"View Note - Secure Notes",
+        title=f"{note['title']} - Secure Notes",
         note=note
     )
-
 
 @notes_bp.route("/edit/<int:note_id>", methods=["GET", "POST"])
 @login_required
 def edit_note(note_id):
     """
-    Note editing route - handles both GET (show form) and POST (update note).
-
-    Args:
-        note_id (int): ID of the note to edit.
-
-    Returns:
-        GET: Renders the note editing form with pre-filled data.
-        POST: Updates note in DB and redirects to dashboard.
-    """
-    db = get_db()
+    Edit note route - handles both GET (show form) and POST (update note).
     
-    # Fetch note for editing
-    # INSECURE: String concatenation - vulnerable to SQL injection
+    v2.2.1: RBAC check - user must own note OR be admin
+    - User: Can edit own notes only
+    - Moderator: Can edit own notes only (not others')
+    - Admin: Can edit any note
+    
+    Args:
+        note_id: ID of note to edit
+        
+    Returns:
+        GET: Renders edit form or 403/404 error
+        POST: Updates note and redirects or 403/404 error
+    """
+    # v2.2.1: Check if user can edit this note
+    if not can_edit_note(note_id):
+        abort(403)  # Forbidden
+    
+    db = get_db()
     query = f"SELECT * FROM notes WHERE id = {note_id}"
     note = db.execute(query).fetchone()
-
-    if note is None:
-        flash("Note not found.", "error")
-        return redirect(url_for("notes.notes_home"))
+    
+    if not note:
+        abort(404)  # Not found
     
     form = NoteForm()
     
     if form.validate_on_submit():
         title = form.title.data.strip()
         content = form.content.data.strip()
-
+        
+        # v2.2.1: Double-check ownership/admin before updating
+        if not can_edit_note(note_id):
+            abort(403)
+        
         # Update note in database
-        # INSECURE: String concatenation - vulnerable to SQL injection
-        # Note: Will be fixed with parameterized queries
-        query = f"UPDATE notes SET title = '{title}', content = '{content}' WHERE id = {note_id}"
-        db.execute(query)
+        # Note: SQL injection still present (will be fixed with parameterized queries)
+        update_query = f"UPDATE notes SET title = '{title}', content = '{content}' WHERE id = {note_id}"
+        db.execute(update_query)
         db.commit()
-
+        
         flash("Note updated successfully!", "success")
         return redirect(url_for("notes.notes_home"))
     
-    # GET request - pre-fill form with existing data
-    if request.method == "GET":
-        form.title.data = note['title']
-        form.content.data = note['content']
+    # GET request or validation failed - show form
+    form.title.data = note['title']
+    form.content.data = note['content']
     
     return render_template(
         "notes/edit.html",
@@ -169,31 +187,39 @@ def edit_note(note_id):
 @login_required
 def delete_note(note_id):
     """
-    Note deletion route - removes a note from the database.
-
+    Delete note route.
+    
+    v2.2.1: RBAC check - user must own note OR be admin/moderator
+    - User: Can delete own notes only
+    - Moderator: Can delete any note (moderation power)
+    - Admin: Can delete any note
+    
     Args:
-        note_id (int): ID of the note to delete.
-
+        note_id: ID of note to delete
+        
     Returns:
-        Redirects to dashboard after deletion.
+        Redirects to dashboard or 403/404 error
     """
+    # v2.2.1: Check if user can delete this note
+    if not can_delete_note(note_id):
+        abort(403)  # Forbidden
+    
     db = get_db()
-
-    # Check if note exists
-    # INSECURE: String concatenation - vulnerable to SQL injection
     query = f"SELECT * FROM notes WHERE id = {note_id}"
     note = db.execute(query).fetchone()
-
-    if note is None:
-        flash("Note not found.", "error")
-        return redirect(url_for("notes.notes_home"))
-
-    # Delete note
-    # INSECURE: String concatenation - vulnerable to SQL injection
-    # No ownership check - anyone can delete any note (IDOR vulnerability)
-    query = f"DELETE FROM notes WHERE id = {note_id}"
-    db.execute(query)
+    
+    if not note:
+        abort(404)  # Not found
+    
+    # v2.2.1: Double-check ownership/admin before deleting
+    if not can_delete_note(note_id):
+        abort(403)
+    
+    # Delete note from database
+    # Note: SQL injection still present (will be fixed with parameterized queries)
+    delete_query = f"DELETE FROM notes WHERE id = {note_id}"
+    db.execute(delete_query)
     db.commit()
-
+    
     flash("Note deleted successfully!", "success")
     return redirect(url_for("notes.notes_home"))

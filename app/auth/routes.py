@@ -48,7 +48,7 @@ def register():
         # SECURE: Hash password with bcrypt before storing
         # Note: SQL injection still present (will be fixed with parameterized queries)
         password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-        insert_query = f"INSERT INTO users (username, password) VALUES ('{username}', '{password_hash.decode('utf-8')}')"
+        insert_query = f"INSERT INTO users (username, password, role) VALUES ('{username}', '{password_hash}', 'user')"
         db.execute(insert_query)
         db.commit()
 
