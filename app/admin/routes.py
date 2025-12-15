@@ -16,12 +16,14 @@ v0.9.3: Functional baseline - INTENTIONALLY INSECURE
 
 from flask import Blueprint, render_template, session
 from app.db import get_db
+from flask_login import login_required
 
 # Blueprint definition
 admin_bp = Blueprint("admin", __name__)
 
 
 @admin_bp.route("/")
+@login_required
 def admin_home():
     """
     Admin dashboard route - displays all users and notes.

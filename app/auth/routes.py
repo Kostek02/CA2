@@ -19,6 +19,8 @@ v0.9.2: Functional baseline - INTENTIONALLY INSECURE
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from app.db import get_db
 import bcrypt
+from flask_login import login_user, logout_user, login_required, current_user
+from app.auth.models import User
 
 # Blueprint definition
 auth_bp = Blueprint("auth", __name__)
@@ -121,10 +123,9 @@ def login():
                 title="Login - Secure Notes"
             )
 
-        # Create session (basic - no Flask-Login yet)
-        # INSECURE: No secure session configuration (no HttpOnly, Secure, SameSite flags)
-        session["user_id"] = user["id"]
-        session["username"] = user["username"]
+        # SECURE: Use Flask-Login for session management
+        user_obj = User(user['id'], user['username'])
+        login_user(user_obj, remember=False)  # remember=True for persistent sessions
 
         flash(f"Welcome back, {user['username']}!", "success")
         return redirect(url_for("notes.notes_home"))
@@ -144,7 +145,7 @@ def logout():
     Returns:
         Redirects to home page after clearing session.
     """
-    # Clear session
-    session.clear()
+    # SECURE: Use Flask-Login logout
+    logout_user()
     flash("You have been logged out.", "success")
     return redirect(url_for("home"))

@@ -25,6 +25,9 @@ from app.helpers import init_app as init_helpers
 from app.error_handlers import register_errorhandlers
 from app.middleware import register_middleware
 
+# Import Flask-Login v2.0.2
+from flask_login import LoginManager
+
 def create_app():
     """
     Factory function for creating and configuring the Flask app.
@@ -43,6 +46,27 @@ def create_app():
 
     # Step 2: Load configuratoin from config.py (Config class)
     app.config.from_object("config.Config")
+
+    # Step 2.5: Initialize Flask-Login
+    login_manager = LoginManager()
+    login_manager.init_app(app)
+    login_manager.login_view = 'auth.login'  # Redirect to login if not authenticated
+    login_manager.login_message = 'Please log in to access this page.'
+    login_manager.login_message_category = 'info'
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        """
+        Flask-Login callback to load user from session.
+
+        Args:
+            user_id: User ID from session
+
+        Returns:
+            User instance or None
+        """
+        from app.auth.models import User
+        return User.get(user_id)
 
     # Step 3: Register Blueprints
     app.register_blueprint(auth_bp, url_prefix="/auth")

@@ -17,12 +17,14 @@ v0.9.1: Functional baseline - INTENTIONALLY INSECURE
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from app.db import get_db
+from flask_login import login_required, current_user
 
 # Blueprint definition
 notes_bp = Blueprint("notes", __name__)
 
 
 @notes_bp.route("/")
+@login_required
 def notes_home():
     '''
     Notes dashboard route - displays notes.
@@ -47,6 +49,7 @@ def notes_home():
 
 
 @notes_bp.route("/create", methods=["GET", "POST"])
+@login_required
 def create_note():
     """
     Note creation route - handles both GET (show form) and POST (create note).
@@ -68,7 +71,7 @@ def create_note():
             )
 
         # Get user_id from session (if logged in)
-        user_id = session.get('user_id')
+        user_id = current_user.id if current_user.is_authenticated else None
         
         # Insert note into database
         # INSECURE: String concatenation - vulnerable to SQL injection
@@ -94,6 +97,7 @@ def create_note():
 
 
 @notes_bp.route("/view/<int:note_id>")
+@login_required
 def view_note(note_id):
     """
     Note viewing route - displays a single note in read-only mode.
@@ -122,6 +126,7 @@ def view_note(note_id):
 
 
 @notes_bp.route("/edit/<int:note_id>", methods=["GET", "POST"])
+@login_required
 def edit_note(note_id):
     """
     Note editing route - handles both GET (show form) and POST (update note).
@@ -178,6 +183,7 @@ def edit_note(note_id):
 
 
 @notes_bp.route("/delete/<int:note_id>")
+@login_required
 def delete_note(note_id):
     """
     Note deletion route - removes a note from the database.
