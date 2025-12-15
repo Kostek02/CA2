@@ -49,9 +49,9 @@ def notes_home():
         ).fetchall()
     else:
         # Regular users can only see their own notes
-        # Note: SQL injection still present (will be fixed with parameterized queries)
-        query = f"SELECT * FROM notes WHERE user_id = {current_user.id} ORDER BY created_at DESC"
-        notes = db.execute(query).fetchall()
+        # v2.3.3: Use parameterized query to prevent SQL injection
+        query = "SELECT * FROM notes WHERE user_id = ? ORDER BY created_at DESC"
+        notes = db.execute(query, (current_user.id,)).fetchall()
     
     # v2.3.2: Log dashboard access
     note_count = len(notes)
@@ -82,11 +82,10 @@ def create_note():
         user_id = current_user.id
         
         # Insert note into database
-        # INSECURE: String concatenation - vulnerable to SQL injection
-        # Note: Will be fixed with parameterized queries
+        # v2.3.3: Use parameterized query to prevent SQL injection
         db = get_db()
-        insert_query = f"INSERT INTO notes (title, content, user_id) VALUES ('{title}', '{content}', {user_id})"
-        db.execute(insert_query)
+        insert_query = "INSERT INTO notes (title, content, user_id) VALUES (?, ?, ?)"
+        db.execute(insert_query, (title, content, user_id))
         db.commit()
 
         # v2.3.2: Log note creation
@@ -121,16 +120,18 @@ def view_note(note_id):
     if not can_view_note(note_id):
         # v2.3.2: Log denied view attempt
         db = get_db()
-        query = f"SELECT * FROM notes WHERE id = {note_id}"
-        note = db.execute(query).fetchone()
+        # v2.3.3: Use parameterized query to prevent SQL injection
+        query = "SELECT * FROM notes WHERE id = ?"
+        note = db.execute(query, (note_id,)).fetchone()
         if note:
             log_crud_event('READ', 'NOTE', note_id, 'DENIED', details='Not owner')
             log_error('403', f'View denied for note {note_id}', details=f'User {current_user.id} attempted to view note owned by {note["user_id"]}')
         abort(403)  # Forbidden
     
     db = get_db()
-    query = f"SELECT * FROM notes WHERE id = {note_id}"
-    note = db.execute(query).fetchone()
+    # v2.3.3: Use parameterized query to prevent SQL injection
+    query = "SELECT * FROM notes WHERE id = ?"
+    note = db.execute(query, (note_id,)).fetchone()
     
     if not note:
         abort(404)  # Not found
@@ -166,16 +167,18 @@ def edit_note(note_id):
     if not can_edit_note(note_id):
         # v2.3.2: Log denied edit attempt
         db = get_db()
-        query = f"SELECT * FROM notes WHERE id = {note_id}"
-        note = db.execute(query).fetchone()
+        # v2.3.3: Use parameterized query to prevent SQL injection
+        query = "SELECT * FROM notes WHERE id = ?"
+        note = db.execute(query, (note_id,)).fetchone()
         if note:
             log_crud_event('UPDATE', 'NOTE', note_id, 'DENIED', details='Not owner')
             log_error('403', f'Edit denied for note {note_id}', details=f'User {current_user.id} attempted to edit note owned by {note["user_id"]}')
         abort(403)  # Forbidden
     
     db = get_db()
-    query = f"SELECT * FROM notes WHERE id = {note_id}"
-    note = db.execute(query).fetchone()
+    # v2.3.3: Use parameterized query to prevent SQL injection
+    query = "SELECT * FROM notes WHERE id = ?"
+    note = db.execute(query, (note_id,)).fetchone()
     
     if not note:
         abort(404)  # Not found
@@ -191,9 +194,9 @@ def edit_note(note_id):
             abort(403)
         
         # Update note in database
-        # Note: SQL injection still present (will be fixed with parameterized queries)
-        update_query = f"UPDATE notes SET title = '{title}', content = '{content}' WHERE id = {note_id}"
-        db.execute(update_query)
+        # v2.3.3: Use parameterized query to prevent SQL injection
+        update_query = "UPDATE notes SET title = ?, content = ? WHERE id = ?"
+        db.execute(update_query, (title, content, note_id))
         db.commit()
         
         # v2.3.2: Log note edit
@@ -234,16 +237,18 @@ def delete_note(note_id):
     if not can_delete_note(note_id):
         # v2.3.2: Log denied delete attempt
         db = get_db()
-        query = f"SELECT * FROM notes WHERE id = {note_id}"
-        note = db.execute(query).fetchone()
+        # v2.3.3: Use parameterized query to prevent SQL injection
+        query = "SELECT * FROM notes WHERE id = ?"
+        note = db.execute(query, (note_id,)).fetchone()
         if note:
             log_crud_event('DELETE', 'NOTE', note_id, 'DENIED', details='Not owner')
             log_error('403', f'Delete denied for note {note_id}', details=f'User {current_user.id} attempted to delete note owned by {note["user_id"]}')
         abort(403)  # Forbidden
     
     db = get_db()
-    query = f"SELECT * FROM notes WHERE id = {note_id}"
-    note = db.execute(query).fetchone()
+    # v2.3.3: Use parameterized query to prevent SQL injection
+    query = "SELECT * FROM notes WHERE id = ?"
+    note = db.execute(query, (note_id,)).fetchone()
     
     if not note:
         abort(404)  # Not found
@@ -253,9 +258,9 @@ def delete_note(note_id):
         abort(403)
     
     # Delete note from database
-    # Note: SQL injection still present (will be fixed with parameterized queries)
-    delete_query = f"DELETE FROM notes WHERE id = {note_id}"
-    db.execute(delete_query)
+    # v2.3.3: Use parameterized query to prevent SQL injection
+    delete_query = "DELETE FROM notes WHERE id = ?"
+    db.execute(delete_query, (note_id,))
     db.commit()
     
     # v2.3.2: Log note deletion

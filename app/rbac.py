@@ -68,9 +68,9 @@ def check_note_ownership(note_id, allow_admin=True):
         403: If user doesn't have permission
     """
     db = get_db()
-    # Note: SQL injection still present (will be fixed with parameterized queries)
-    query = f"SELECT * FROM notes WHERE id = {note_id}"
-    note = db.execute(query).fetchone()
+    # v2.3.3: Use parameterized query to prevent SQL injection
+    query = "SELECT * FROM notes WHERE id = ?"
+    note = db.execute(query, (note_id,)).fetchone()
     
     if not note:
         abort(404)  # Note not found
@@ -105,8 +105,9 @@ def can_edit_note(note_id):
     if current_user.is_admin():
         # Admin can edit any note (but check it exists)
         db = get_db()
-        query = f"SELECT * FROM notes WHERE id = {note_id}"
-        note = db.execute(query).fetchone()
+        # v2.3.3: Use parameterized query to prevent SQL injection
+        query = "SELECT * FROM notes WHERE id = ?"
+        note = db.execute(query, (note_id,)).fetchone()
         return note is not None
     
     # Regular users and moderators can only edit their own notes
@@ -135,8 +136,9 @@ def can_delete_note(note_id):
     if current_user.is_admin() or current_user.is_moderator():
         # Admin and Moderator can delete any note (but check it exists)
         db = get_db()
-        query = f"SELECT * FROM notes WHERE id = {note_id}"
-        note = db.execute(query).fetchone()
+        # v2.3.3: Use parameterized query to prevent SQL injection
+        query = "SELECT * FROM notes WHERE id = ?"
+        note = db.execute(query, (note_id,)).fetchone()
         return note is not None
     
     # Regular users can only delete their own notes
@@ -165,8 +167,9 @@ def can_view_note(note_id):
     if current_user.is_moderator() or current_user.is_admin():
         # Moderators and admins can view all notes
         db = get_db()
-        query = f"SELECT * FROM notes WHERE id = {note_id}"
-        note = db.execute(query).fetchone()
+        # v2.3.3: Use parameterized query to prevent SQL injection
+        query = "SELECT * FROM notes WHERE id = ?"
+        note = db.execute(query, (note_id,)).fetchone()
         return note is not None
     
     # Regular users can only view their own notes

@@ -47,9 +47,9 @@ class User(UserMixin):
         from app.db import get_db
         
         db = get_db()
-        # Note: SQL injection still present (will be fixed with parameterized queries)
-        query = f"SELECT * FROM users WHERE id = {user_id}"
-        user_row = db.execute(query).fetchone()
+        # v2.3.3: Use parameterized query to prevent SQL injection
+        query = "SELECT * FROM users WHERE id = ?"
+        user_row = db.execute(query, (user_id,)).fetchone()
         
         if user_row:
             # v2.2.1: Load role from database

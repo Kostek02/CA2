@@ -82,12 +82,12 @@ def register():
         
         # Insert new user into database
         # SECURE: Hash password with bcrypt before storing
-        # Note: SQL injection still present (will be fixed with parameterized queries)
+        # v2.3.3: Use parameterized query to prevent SQL injection
         password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         # Convert bytes to string for database storage
         password_hash_str = password_hash.decode('utf-8')
-        insert_query = f"INSERT INTO users (username, password, role) VALUES ('{username}', '{password_hash_str}', 'user')"
-        db.execute(insert_query)
+        insert_query = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)"
+        db.execute(insert_query, (username, password_hash_str, 'user'))
         db.commit()
 
         # v2.3.2: Log registration event
@@ -126,9 +126,9 @@ def login():
 
         # Authenticate user
         # SECURE: Get user by username only, then verify password hash
-        # Note: SQL injection still present (will be fixed with parameterized queries)
-        query = f"SELECT * FROM users WHERE username = '{username}'"
-        user = db.execute(query).fetchone()
+        # v2.3.3: Use parameterized query to prevent SQL injection
+        query = "SELECT * FROM users WHERE username = ?"
+        user = db.execute(query, (username,)).fetchone()
 
         if user:
             # Verify password using bcrypt

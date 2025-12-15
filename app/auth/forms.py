@@ -55,9 +55,9 @@ class RegistrationForm(FlaskForm):
             ValidationError: If username already exists
         """
         db = get_db()
-        # Note: SQL injection still present (will be fixed with parameterized queries)
-        query = f"SELECT * FROM users WHERE username = '{username.data}'"
-        existing_user = db.execute(query).fetchone()
+        # v2.3.3: Use parameterized query to prevent SQL injection
+        query = "SELECT * FROM users WHERE username = ?"
+        existing_user = db.execute(query, (username.data,)).fetchone()
         
         if existing_user:
             raise ValidationError('Username already exists. Please choose another.')
