@@ -9,7 +9,7 @@ Purpose:
 
 v0.9.2: Functional baseline - INTENTIONALLY INSECURE
 - Uses string concatenation for SQL queries (SQL injection vulnerable)
-- Passwords stored in plaintext (no bcrypt)
+- Password hashing with bcrypt (secure)
 - Basic Flask session management (no Flask-Login yet)
 - No CSRF protection
 - No rate limiting
@@ -18,6 +18,7 @@ v0.9.2: Functional baseline - INTENTIONALLY INSECURE
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from app.db import get_db
+import bcrypt
 
 # Blueprint definition
 auth_bp = Blueprint("auth", __name__)
@@ -59,9 +60,9 @@ def register():
             )
 
         # Insert new user into database
-        # INSECURE: String concatenation - vulnerable to SQL injection
-        # INSECURE: Password stored in plaintext (no hashing)
-        insert_query = f"INSERT INTO users (username, password) VALUES ('{username}', '{password}')"
+        # SECURE: Hash password with bcrypt before storing
+        password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        insert_query = f"INSERT INTO users (username, password) VALUES ('{username}', '{password_hash.decode('utf-8')}')"
         db.execute(insert_query)
         db.commit()
 
@@ -99,11 +100,20 @@ def login():
         db = get_db()
 
         # Authenticate user
-        # INSECURE: String concatenation - vulnerable to SQL injection
-        # INSECURE: Password comparison in plaintext (no hashing)
-        query = f"SELECT * FROM users WHERE username = '{username}' AND password = '{password}'"
+        # SECURE: Get user by username only, then verify password hash
+        # Note: SQL injection still present (will be fixed in v2.1.1)
+        query = f"SELECT * FROM users WHERE username = '{username}'"
         user = db.execute(query).fetchone()
 
+        if user:
+            # Verify password using bcrypt
+            stored_hash = user['password'].encode('utf-8')
+            if bcrypt.checkpw(password.encode('utf-8'), stored_hash):
+                # Password correct - proceed with login
+                pass  # User is valid, continue with session creation
+            else:
+                # Password incorrect
+                user = None
         if user is None:
             flash("Invalid username or password.", "error")
             return render_template(
