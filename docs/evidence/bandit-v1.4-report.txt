@@ -1,0 +1,131 @@
+Run started:2025-12-15 14:42:32.885787
+
+Test results:
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/auth/routes.py:51:22
+50	        # INSECURE: String concatenation - vulnerable to SQL injection
+51	        check_query = f"SELECT * FROM users WHERE username = '{username}'"
+52	        existing_user = db.execute(check_query).fetchone()
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/auth/routes.py:64:23
+63	        # INSECURE: Password stored in plaintext (no hashing)
+64	        insert_query = f"INSERT INTO users (username, password) VALUES ('{username}', '{password}')"
+65	        db.execute(insert_query)
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/auth/routes.py:104:16
+103	        # INSECURE: Password comparison in plaintext (no hashing)
+104	        query = f"SELECT * FROM users WHERE username = '{username}' AND password = '{password}'"
+105	        user = db.execute(query).fetchone()
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/notes/routes.py:78:27
+77	        if user_id:
+78	            insert_query = f"INSERT INTO notes (title, content, user_id) VALUES ('{title}', '{content}', {user_id})"
+79	        else:
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/notes/routes.py:81:27
+80	            # If not logged in, user_id is NULL (v0.9.1 behavior)
+81	            insert_query = f"INSERT INTO notes (title, content, user_id) VALUES ('{title}', '{content}', NULL)"
+82	        
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/notes/routes.py:110:12
+109	    # No ownership check - anyone can view any note
+110	    query = f"SELECT * FROM notes WHERE id = {note_id}"
+111	    note = db.execute(query).fetchone()
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/notes/routes.py:146:20
+145	            # Fetch note for re-rendering form
+146	            query = f"SELECT * FROM notes WHERE id = {note_id}"
+147	            note = db.execute(query).fetchone()
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/notes/routes.py:157:16
+156	        # No ownership check - anyone can edit any note (IDOR vulnerability)
+157	        query = f"UPDATE notes SET title = '{title}', content = '{content}' WHERE id = {note_id}"
+158	        db.execute(query)
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/notes/routes.py:166:12
+165	    # INSECURE: String concatenation - vulnerable to SQL injection
+166	    query = f"SELECT * FROM notes WHERE id = {note_id}"
+167	    note = db.execute(query).fetchone()
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/notes/routes.py:195:12
+194	    # INSECURE: String concatenation - vulnerable to SQL injection
+195	    query = f"SELECT * FROM notes WHERE id = {note_id}"
+196	    note = db.execute(query).fetchone()
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/notes/routes.py:205:12
+204	    # No ownership check - anyone can delete any note (IDOR vulnerability)
+205	    query = f"DELETE FROM notes WHERE id = {note_id}"
+206	    db.execute(query)
+
+--------------------------------------------------
+
+Code scanned:
+	Total lines of code: 474
+	Total lines skipped (#nosec): 0
+	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0
+
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 0
+		Medium: 11
+		High: 0
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 11
+		Medium: 0
+		High: 0
+Files skipped (0):

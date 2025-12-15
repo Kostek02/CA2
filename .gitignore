@@ -14,5 +14,13 @@ __pycache__/
 venv/
 .DS_Store
 
+# Testing
+tests/__pycache__/
+tests/*.pyc
+htmlcov/
+.pytest_cache/
+.coverage
+# Note: Coverage HTML reports in docs/evidence/ are committed as evidence
+
 # Database
 instance/secure_notes.db
