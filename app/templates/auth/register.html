@@ -2,16 +2,37 @@
 {% block content %}
 <main>
     <h2>Register</h2>
-    <p>This version (v0.3.2) introduces the registration page layout.</p>
+    
+    {# Display flash messages #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}" style="padding: 0.75rem; margin-bottom: 1rem; border-radius: 4px; 
+                    {% if category == 'error' %}background-color: #f8d7da; color: #721c24;{% else %}background-color: #d4edda; color: #155724;{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 
-    <form method="POST" action="#">
-        <label for="username">Username:</label><br>
-        <input type="text" id="username" name="username" placeholder="Choose a username"><br><br>
+    {# Registration form - no CSRF protection (vulnerable to CSRF) #}
+    <form method="POST" action="{{ url_for('auth.register') }}">
+        <div style="margin-bottom: 1rem;">
+            <label for="username">Username:</label><br>
+            <input type="text" id="username" name="username" placeholder="Choose a username" required
+                   style="width: 100%; max-width: 300px; padding: 0.5rem; margin-top: 0.25rem;">
+        </div>
 
-        <label for="password">Password:</label><br>
-        <input type="password" id="password" name="password" placeholder="Choose a password"><br><br>
+        <div style="margin-bottom: 1rem;">
+            <label for="password">Password:</label><br>
+            <input type="password" id="password" name="password" placeholder="Choose a password" required
+                   style="width: 100%; max-width: 300px; padding: 0.5rem; margin-top: 0.25rem;">
+        </div>
 
-        <button type="submit">Register</button>
+        <div>
+            <button type="submit" class="btn btn-primary">Register</button>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-secondary">Already have an account? Login</a>
+        </div>
     </form>
 </main>
 {% endblock %}
