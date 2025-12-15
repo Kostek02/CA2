@@ -17,6 +17,7 @@ from flask import Blueprint, render_template, session
 from app.db import get_db
 from flask_login import login_required
 from app.rbac import admin_required
+from app.audit import log_crud_event
 
 # Blueprint definition
 admin_bp = Blueprint("admin", __name__)
@@ -50,6 +51,11 @@ def admin_home():
         ORDER BY notes.created_at DESC
     """
     notes = db.execute(notes_query).fetchall()
+
+    # v2.3.2: Log admin dashboard access
+    user_count = len(users)
+    note_count = len(notes)
+    log_crud_event('READ', 'ADMIN_DASHBOARD', 'all', 'SUCCESS', details=f'Users: {user_count}, Notes: {note_count}')
 
     return render_template(
         "admin/dashboard.html",

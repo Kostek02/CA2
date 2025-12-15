@@ -20,7 +20,11 @@ tests/*.pyc
 htmlcov/
 .pytest_cache/
 .coverage
-# Note: Coverage HTML reports in docs/evidence/ are committed as evidence
 
 # Database
 instance/secure_notes.db
+
+# Log files (v2.3.2)
+logs/*.log
+logs/*.log.*
+!docs/evidence/**/*.log

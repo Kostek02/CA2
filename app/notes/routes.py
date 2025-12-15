@@ -20,6 +20,7 @@ from app.db import get_db
 from flask_login import login_required, current_user
 from app.notes.forms import NoteForm
 from app.rbac import check_note_ownership, can_edit_note, can_delete_note, can_view_note
+from app.audit import log_crud_event, log_error
 
 # Blueprint definition
 notes_bp = Blueprint("notes", __name__)
@@ -52,6 +53,11 @@ def notes_home():
         query = f"SELECT * FROM notes WHERE user_id = {current_user.id} ORDER BY created_at DESC"
         notes = db.execute(query).fetchall()
     
+    # v2.3.2: Log dashboard access
+    note_count = len(notes)
+    role = 'admin' if current_user.is_admin() else 'moderator' if current_user.is_moderator() else 'user'
+    log_crud_event('READ', 'DASHBOARD', 'all', 'SUCCESS', details=f'Role: {role}, Notes shown: {note_count}')
+    
     return render_template(
         "notes/dashboard.html",
         title="Notes Dashboard - Secure Notes",
@@ -83,6 +89,10 @@ def create_note():
         db.execute(insert_query)
         db.commit()
 
+        # v2.3.2: Log note creation
+        note_id = db.execute("SELECT last_insert_rowid()").fetchone()[0]
+        log_crud_event('CREATE', 'NOTE', note_id, 'SUCCESS', details=f'Title: {title[:50]}')
+
         flash("Note created successfully!", "success")
         return redirect(url_for("notes.notes_home"))
     
@@ -109,6 +119,13 @@ def view_note(note_id):
     """
     # v2.2.1: Check if user can view this note
     if not can_view_note(note_id):
+        # v2.3.2: Log denied view attempt
+        db = get_db()
+        query = f"SELECT * FROM notes WHERE id = {note_id}"
+        note = db.execute(query).fetchone()
+        if note:
+            log_crud_event('READ', 'NOTE', note_id, 'DENIED', details='Not owner')
+            log_error('403', f'View denied for note {note_id}', details=f'User {current_user.id} attempted to view note owned by {note["user_id"]}')
         abort(403)  # Forbidden
     
     db = get_db()
@@ -117,6 +134,9 @@ def view_note(note_id):
     
     if not note:
         abort(404)  # Not found
+    
+    # v2.3.2: Log note view
+    log_crud_event('READ', 'NOTE', note_id, 'SUCCESS')
     
     return render_template(
         "notes/view.html",
@@ -144,6 +164,13 @@ def edit_note(note_id):
     """
     # v2.2.1: Check if user can edit this note
     if not can_edit_note(note_id):
+        # v2.3.2: Log denied edit attempt
+        db = get_db()
+        query = f"SELECT * FROM notes WHERE id = {note_id}"
+        note = db.execute(query).fetchone()
+        if note:
+            log_crud_event('UPDATE', 'NOTE', note_id, 'DENIED', details='Not owner')
+            log_error('403', f'Edit denied for note {note_id}', details=f'User {current_user.id} attempted to edit note owned by {note["user_id"]}')
         abort(403)  # Forbidden
     
     db = get_db()
@@ -168,6 +195,9 @@ def edit_note(note_id):
         update_query = f"UPDATE notes SET title = '{title}', content = '{content}' WHERE id = {note_id}"
         db.execute(update_query)
         db.commit()
+        
+        # v2.3.2: Log note edit
+        log_crud_event('UPDATE', 'NOTE', note_id, 'SUCCESS', details=f'Title: {title[:50]}')
         
         flash("Note updated successfully!", "success")
         return redirect(url_for("notes.notes_home"))
@@ -202,6 +232,13 @@ def delete_note(note_id):
     """
     # v2.2.1: Check if user can delete this note
     if not can_delete_note(note_id):
+        # v2.3.2: Log denied delete attempt
+        db = get_db()
+        query = f"SELECT * FROM notes WHERE id = {note_id}"
+        note = db.execute(query).fetchone()
+        if note:
+            log_crud_event('DELETE', 'NOTE', note_id, 'DENIED', details='Not owner')
+            log_error('403', f'Delete denied for note {note_id}', details=f'User {current_user.id} attempted to delete note owned by {note["user_id"]}')
         abort(403)  # Forbidden
     
     db = get_db()
@@ -220,6 +257,9 @@ def delete_note(note_id):
     delete_query = f"DELETE FROM notes WHERE id = {note_id}"
     db.execute(delete_query)
     db.commit()
+    
+    # v2.3.2: Log note deletion
+    log_crud_event('DELETE', 'NOTE', note_id, 'SUCCESS')
     
     flash("Note deleted successfully!", "success")
     return redirect(url_for("notes.notes_home"))

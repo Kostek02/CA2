@@ -22,6 +22,7 @@ import bcrypt
 from flask_login import login_user, logout_user, login_required, current_user
 from app.auth.models import User
 from app.auth.forms import RegistrationForm, LoginForm
+from app.audit import log_auth_event, log_error
 # Blueprint definition
 auth_bp = Blueprint("auth", __name__)
 
@@ -51,6 +52,8 @@ def check_rate_limits():
                 wrapped = limiter.limit(limit_str)(_check)
                 wrapped()
             except RateLimitExceeded:
+                # v2.3.2: Log rate limit trigger (before abort)
+                log_error('RATE_LIMIT', f'Rate limit triggered for {request.endpoint}', details=f'IP: {get_remote_address()}, Limit: {limit_str}')
                 abort(429)
             except Exception:
                 # If limiter not properly configured, allow request
@@ -86,6 +89,9 @@ def register():
         insert_query = f"INSERT INTO users (username, password, role) VALUES ('{username}', '{password_hash_str}', 'user')"
         db.execute(insert_query)
         db.commit()
+
+        # v2.3.2: Log registration event
+        log_auth_event('REGISTER', 'SUCCESS', username=username)
 
         flash("Registration successful! Please login.", "success")
         return redirect(url_for("auth.login"))
@@ -140,6 +146,9 @@ def login():
                 # Invalid hash format (might be old plaintext password or corrupted)
                 user = None
         if user is None:
+            # v2.3.2: Log failed login attempt
+            log_auth_event('LOGIN', 'FAILURE', username=username, details='Invalid credentials')
+            log_error('AUTH_FAILURE', f'Failed login attempt for user: {username}')
             flash("Invalid username or password.", "error")
             return render_template(
                 "auth/login.html",
@@ -150,6 +159,9 @@ def login():
         # SECURE: Use Flask-Login for session management
         user_obj = User(user['id'], user['username'])
         login_user(user_obj, remember=False)
+
+        # v2.3.2: Log successful login
+        log_auth_event('LOGIN', 'SUCCESS', username=username)
 
         flash(f"Welcome back, {user['username']}!", "success")
         return redirect(url_for("notes.notes_home"))
@@ -171,6 +183,9 @@ def logout():
         Redirects to home page after clearing session.
     """
     # SECURE: Use Flask-Login logout
+    # v2.3.2: Log logout event
+    if current_user.is_authenticated:
+        log_auth_event('LOGOUT', 'SUCCESS', username=current_user.username)
     logout_user()
     flash("You have been logged out.", "success")
     return redirect(url_for("home"))

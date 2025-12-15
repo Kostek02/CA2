@@ -34,6 +34,9 @@ from flask_talisman import Talisman
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
+# Import audit logging
+from app.audit import setup_logging
+
 def create_app():
     """
     Factory function for creating and configuring the Flask app.
@@ -100,6 +103,10 @@ def create_app():
     login_manager.login_view = 'auth.login'  # Redirect to login if not authenticated
     login_manager.login_message = 'Please log in to access this page.'
     login_manager.login_message_category = 'info'
+
+    # Step 2.6: Initialise Audit Logging (v2.3.2)
+    # Audit logging for authentication and CRUD operations
+    setup_logging(app)
 
     @login_manager.user_loader
     def load_user(user_id):
